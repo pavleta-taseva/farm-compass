@@ -1,37 +1,61 @@
-import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
-import { useFonts } from 'expo-font';
-import { Stack } from 'expo-router';
+import * as Font from 'expo-font';
 import * as SplashScreen from 'expo-splash-screen';
-import { useEffect } from 'react';
 import 'react-native-reanimated';
-
+import Entypo from '@expo/vector-icons/Entypo';
+import React, { useEffect, useCallback, useState } from 'react';
+import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
+import { Stack } from 'expo-router';
+import { Text, View, Image } from 'react-native';
 import { useColorScheme } from '@/src/hooks/useColorScheme';
+import styles from '@/src/screens/HomeScreen/HomeScreen.styles';
 
-// Prevent the splash screen from auto-hiding before asset loading is complete.
-SplashScreen.preventAutoHideAsync();
-
-export default function RootLayout() {
+const RootLayout: React.FC = () => {
   const colorScheme = useColorScheme();
-  const [loaded] = useFonts({
-    SpaceMono: require('../assets/fonts/SpaceMono-Regular.ttf'),
-  });
+  const [appIsReady, setAppIsReady] = useState(false);
 
   useEffect(() => {
-    if (loaded) {
-      SplashScreen.hideAsync();
-    }
-  }, [loaded]);
+    async function prepare() {
+      try {
+        await Font.loadAsync(Entypo.font);
 
-  if (!loaded) {
-    return null;
-  }
+        await new Promise(resolve => setTimeout(resolve, 5000));
+      } catch (e) {
+        console.warn(e);
+      } finally {
+        setAppIsReady(true);
+      }
+    }
+
+    prepare();
+  }, []);
+
+  const onLayoutRootView = useCallback(async () => {
+    if (appIsReady) {
+      await SplashScreen.hideAsync();
+    }
+  }, [appIsReady]);
 
   return (
     <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-      <Stack>
-        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-        <Stack.Screen name="+not-found" />
-      </Stack>
+      {!appIsReady ?
+        <>
+          <View
+            style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}
+            onLayout={onLayoutRootView}>
+            <Text>Farm Compass</Text>
+            <Image
+              source={require('@/src/assets/images/loading.gif')}
+              style={styles.loadingImage}
+            />
+            <Text>Loading...</Text>
+          </View></>
+        : <Stack>
+          <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+          <Stack.Screen name="+not-found" />
+        </Stack>
+      }
     </ThemeProvider>
   );
-}
+};
+
+export default RootLayout;

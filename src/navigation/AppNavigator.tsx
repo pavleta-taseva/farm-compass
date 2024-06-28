@@ -10,10 +10,9 @@ const AppNavigator: React.FC = () => {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    // Simulate a loading process (e.g., fetching data, authentication)
     const timer = setTimeout(() => {
       setIsLoading(false);
-    }, 3000); // Adjust the timeout as needed
+    }, 10000);
 
     return () => clearTimeout(timer);
   }, []);

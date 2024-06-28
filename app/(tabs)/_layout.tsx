@@ -1,11 +1,11 @@
-import { Tabs } from 'expo-router';
 import React from 'react';
+import { Tabs } from 'expo-router';
 
-import { TabBarIcon } from '@/src/components/navigation/TabBarIcon';
-import { Colors } from '@/src/constants/Colors';
+import { TabBarIcon } from '@/src/navigation/TabBarIcon';
+import { Colors } from '@/src/constants/colors';
 import { useColorScheme } from '@/src/hooks/useColorScheme';
 
-export default function TabLayout() {
+const TabLayout: React.FC = () => {
   const colorScheme = useColorScheme();
 
   return (
@@ -13,7 +13,8 @@ export default function TabLayout() {
       screenOptions={{
         tabBarActiveTintColor: Colors[colorScheme ?? 'light'].tint,
         headerShown: false,
-      }}>
+      }}
+    >
       <Tabs.Screen
         name="index"
         options={{
@@ -34,4 +35,6 @@ export default function TabLayout() {
       />
     </Tabs>
   );
-}
+};
+
+export default TabLayout;
